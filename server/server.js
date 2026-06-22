@@ -3,23 +3,24 @@ const express = require("express");
 const cors = require("cors");
 const connectDB = require("./config/db");
 
-// ── Middleware ─────────────────────────────────────────────────────────────────
-app.use(cors({ 
-  origin: [
-    "http://localhost:5173", 
-    "https://rojan-food-blog.vercel.app"
-  ] 
-}));
-
 // ── Route imports ──────────────────────────────────────────────────────────────
 const authRoutes = require("./routes/auth.routes");
 const postRoutes = require("./routes/post.routes");
 const commentRoutes = require("./routes/comment.routes");
 
+// Initialize app first so middleware can access it
 const app = express();
 
 // ── Middleware ─────────────────────────────────────────────────────────────────
-app.use(cors({ origin: process.env.CLIENT_URL || "http://localhost:5173" }));
+// Allows both your local computer and your live Vercel website to talk to Render
+app.use(cors({ 
+  origin: [
+    "http://localhost:5173", 
+    "https://rojan-food-blog.vercel.app"
+  ],
+  credentials: true
+}));
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -53,5 +54,5 @@ app.use((err, req, res, next) => {
 // ── Start server ───────────────────────────────────────────────────────────────
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
+  console.log(`Server running on port ${PORT}`);
 });
