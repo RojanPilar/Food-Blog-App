@@ -3,6 +3,14 @@ const express = require("express");
 const cors = require("cors");
 const connectDB = require("./config/db");
 
+// ── Middleware ─────────────────────────────────────────────────────────────────
+app.use(cors({ 
+  origin: [
+    "http://localhost:5173", 
+    "https://rojan-food-blog.vercel.app"
+  ] 
+}));
+
 // ── Route imports ──────────────────────────────────────────────────────────────
 const authRoutes = require("./routes/auth.routes");
 const postRoutes = require("./routes/post.routes");
