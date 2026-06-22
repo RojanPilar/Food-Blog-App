@@ -1,0 +1,632 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ── Google Fonts are loaded in index.html ─────────────────────────────────── */
+
+/* ── CSS Custom Properties (light + dark mode) ───────────────────────────────
+   YouTube-inspired design system with warm neutrals
+   ─────────────────────────────────────────────────────────────────────────── */
+:root {
+  --yt-bg:          #f9f9f9;
+  --yt-surface:     #ffffff;
+  --yt-surface-alt: #f2f2f2;
+  --yt-border:      #e0e0e0;
+  --yt-text:        #0f0f0f;
+  --yt-text-muted:  #606060;
+  --yt-text-hint:   #909090;
+  --yt-accent:      #1565c0;   /* was --yt-red — now the site-wide brand accent */
+  --yt-accent-dark: #0d47a1;   /* was --yt-red-dark */
+  --yt-danger:      #d32f2f;   /* semantic destructive-action red — NOT a brand accent */
+  --yt-danger-dark: #b71c1c;
+  --yt-star:        #f5a623;   /* rating stars — semantic, kept warm by convention */
+  --yt-sidebar-w:   240px;
+  --yt-sidebar-w-mini: 72px;
+  --yt-nav-h:       56px;
+
+  /* Auth-flow now aliases the site-wide accent so auth and blog stay one palette */
+  --auth-blue:        var(--yt-accent);
+  --auth-blue-hover:  var(--yt-accent-dark);
+  --auth-blue-soft:   #e8f0fe;
+  --auth-blue-ring:   rgba(21, 101, 192, 0.22);
+  --auth-blue-shadow: rgba(13, 71, 161, 0.28);
+}
+
+[data-theme="dark"] {
+  --yt-bg:          #0f0f0f;
+  --yt-surface:     #212121;
+  --yt-surface-alt: #272727;
+  --yt-border:      #3f3f3f;
+  --yt-text:        #f1f1f1;
+  --yt-text-muted:  #aaaaaa;
+  --yt-text-hint:   #717171;
+
+  --auth-blue-soft:   rgba(21, 101, 192, 0.16);
+  --auth-blue-ring:   rgba(66, 150, 240, 0.3);
+}
+
+@layer base {
+  html { scroll-behavior: smooth; }
+  body {
+    @apply antialiased;
+    background: var(--yt-bg);
+    color: var(--yt-text);
+    font-family: "Inter", ui-sans-serif, system-ui, sans-serif;
+  }
+  *, *::before, *::after { box-sizing: border-box; }
+}
+
+@layer components {
+  /* ── YouTube-style top nav ───────────────────────────────────────────── */
+  .yt-nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    height: var(--yt-nav-h);
+    background: var(--yt-surface);
+    border-bottom: 1px solid var(--yt-border);
+    display: flex;
+    align-items: center;
+    padding: 0 16px;
+    z-index: 100;
+    gap: 16px;
+  }
+
+  /* ── Left sidebar ────────────────────────────────────────────────────── */
+  .yt-sidebar {
+    position: fixed;
+    top: var(--yt-nav-h);
+    left: 0;
+    bottom: 0;
+    width: var(--yt-sidebar-w);
+    background: var(--yt-surface);
+    overflow-y: auto;
+    overflow-x: hidden;
+    z-index: 50;
+    transition: width 0.2s ease, transform 0.2s ease;
+    border-right: 1px solid var(--yt-border);
+  }
+  .yt-sidebar.collapsed {
+    width: var(--yt-sidebar-w-mini);
+  }
+  .yt-sidebar.hidden-mobile {
+    transform: translateX(-100%);
+  }
+
+  /* ── Main content area ───────────────────────────────────────────────── */
+  .yt-main {
+    margin-left: var(--yt-sidebar-w);
+    padding-top: var(--yt-nav-h);
+    min-height: 100vh;
+    transition: margin-left 0.2s ease;
+  }
+  .yt-main.sidebar-collapsed {
+    margin-left: var(--yt-sidebar-w-mini);
+  }
+  .yt-main.sidebar-hidden {
+    margin-left: 0;
+  }
+
+  /* ── Search bar ──────────────────────────────────────────────────────── */
+  .yt-search-bar {
+    flex: 1;
+    max-width: 600px;
+    display: flex;
+    align-items: center;
+    border: 1px solid var(--yt-border);
+    border-radius: 40px;
+    overflow: hidden;
+    background: var(--yt-bg);
+    transition: border-color 0.15s;
+  }
+  .yt-search-bar:focus-within {
+    border-color: #1565c0;
+    box-shadow: 0 0 0 1px #1565c0;
+  }
+  .yt-search-input {
+    flex: 1;
+    border: none;
+    outline: none;
+    background: transparent;
+    color: var(--yt-text);
+    font-size: 16px;
+    padding: 6px 16px;
+  }
+  .yt-search-input::placeholder {
+    color: var(--yt-text-hint);
+  }
+  .yt-search-btn {
+    padding: 6px 20px;
+    background: var(--yt-surface-alt);
+    border: none;
+    border-left: 1px solid var(--yt-border);
+    cursor: pointer;
+    color: var(--yt-text-muted);
+    transition: background 0.15s;
+  }
+  .yt-search-btn:hover { background: var(--yt-border); }
+
+  /* ── Blog post card (YouTube video card style) ───────────────────────── */
+  .yt-card {
+    cursor: pointer;
+    transition: opacity 0.15s;
+  }
+  .yt-card:hover { opacity: 0.9; }
+  .yt-card:hover .yt-thumb img {
+    transform: scale(1.02);
+  }
+
+  .yt-thumb {
+    position: relative;
+    aspect-ratio: 16 / 9;
+    background: var(--yt-surface-alt);
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 12px;
+  }
+  .yt-thumb img {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+  }
+  .yt-thumb-placeholder {
+    width: 100%; height: 100%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 48px;
+    background: linear-gradient(135deg, #f2f2f2 0%, #e0e0e0 100%);
+  }
+  [data-theme="dark"] .yt-thumb-placeholder {
+    background: linear-gradient(135deg, #272727 0%, #3f3f3f 100%);
+  }
+
+  /* Duration badge overlay */
+  .yt-duration {
+    position: absolute;
+    bottom: 8px; right: 8px;
+    background: rgba(0,0,0,0.85);
+    color: #fff;
+    font-size: 12px;
+    font-weight: 500;
+    padding: 1px 6px;
+    border-radius: 4px;
+    letter-spacing: 0.02em;
+  }
+
+  /* Difficulty badge */
+  .yt-diff-badge {
+    position: absolute;
+    top: 8px; left: 8px;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  /* Card meta row */
+  .yt-card-meta {
+    display: flex;
+    gap: 8px;
+    align-items: flex-start;
+  }
+  .yt-avatar-sm {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    background: var(--yt-surface-alt);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px; font-weight: 600;
+    color: var(--yt-text-muted);
+    flex-shrink: 0;
+    overflow: hidden;
+  }
+  .yt-card-info { flex: 1; min-width: 0; }
+  .yt-card-title {
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 1.4;
+    color: var(--yt-text);
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    margin-bottom: 4px;
+  }
+  .yt-card-author {
+    font-size: 13px;
+    color: var(--yt-text-muted);
+    margin-bottom: 2px;
+  }
+  .yt-card-stats {
+    font-size: 12px;
+    color: var(--yt-text-hint);
+  }
+
+  /* ── Chip filter row (YouTube category chips) ────────────────────────── */
+  .yt-chips {
+    display: flex;
+    gap: 10px;
+    overflow-x: auto;
+    padding: 12px 24px;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    background: var(--yt-surface);
+    border-bottom: 1px solid var(--yt-border);
+    position: sticky;
+    top: var(--yt-nav-h);
+    z-index: 40;
+  }
+  .yt-chips::-webkit-scrollbar { display: none; }
+  .yt-chip {
+    flex-shrink: 0;
+    padding: 6px 14px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    border: none;
+    transition: background 0.15s, color 0.15s;
+    background: var(--yt-surface-alt);
+    color: var(--yt-text);
+  }
+  .yt-chip:hover { background: var(--yt-border); }
+  .yt-chip.active {
+    background: var(--yt-text);
+    color: var(--yt-surface);
+  }
+
+  /* ── Sidebar nav items ───────────────────────────────────────────────── */
+  .yt-nav-item {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 10px 12px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--yt-text);
+    text-decoration: none;
+    transition: background 0.1s;
+    margin: 2px 8px;
+    white-space: nowrap;
+  }
+  .yt-nav-item:hover { background: var(--yt-surface-alt); }
+  .yt-nav-item.active { background: var(--yt-surface-alt); font-weight: 600; }
+  .yt-nav-icon {
+    width: 24px; height: 24px;
+    flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    margin-left: 4px;
+  }
+  .yt-sidebar.collapsed .yt-nav-label { display: none; }
+  .yt-sidebar.collapsed .yt-nav-section-title { display: none; }
+  .yt-nav-section-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--yt-text);
+    padding: 8px 20px 4px;
+    margin-top: 8px;
+  }
+  .yt-sidebar-divider {
+    height: 1px;
+    background: var(--yt-border);
+    margin: 8px 0;
+  }
+
+  /* ── YouTube-style icon button (nav bar) ─────────────────────────────── */
+  .yt-icon-btn {
+    width: 40px; height: 40px;
+    border-radius: 50%;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--yt-text);
+    transition: background 0.15s;
+  }
+  .yt-icon-btn:hover { background: var(--yt-surface-alt); }
+
+  /* ── YT-style page layout helpers ───────────────────────────────────── */
+  .yt-page-pad { padding: 24px; }
+  .yt-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 16px 16px;
+  }
+
+  /* ── Channel/author header on post detail ────────────────────────────── */
+  .yt-channel-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px 0;
+    border-bottom: 1px solid var(--yt-border);
+    margin-bottom: 20px;
+  }
+  .yt-avatar-lg {
+    width: 48px; height: 48px;
+    border-radius: 50%;
+    background: var(--yt-accent);
+    color: #fff;
+    font-size: 18px;
+    font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    overflow: hidden;
+  }
+
+  /* ── Buttons ─────────────────────────────────────────────────────────── */
+  .btn-primary {
+    @apply inline-flex items-center gap-2 px-5 py-2.5 font-semibold text-sm rounded-full
+           transition-colors duration-150 disabled:opacity-50 disabled:cursor-not-allowed;
+    background: var(--yt-accent);
+    color: #fff;
+  }
+  .btn-primary:hover:not(:disabled) { background: var(--yt-accent-dark); }
+
+  .btn-secondary {
+    @apply inline-flex items-center gap-2 px-5 py-2.5 font-semibold text-sm rounded-full
+           transition-colors duration-150;
+    background: var(--yt-surface-alt);
+    color: var(--yt-text);
+    border: 1px solid var(--yt-border);
+  }
+  .btn-secondary:hover { background: var(--yt-border); }
+
+  .btn-danger {
+    @apply inline-flex items-center gap-2 px-5 py-2.5 font-semibold text-sm rounded-full
+           transition-colors duration-150;
+    background: var(--yt-danger);
+    color: #fff;
+  }
+  .btn-danger:hover { background: var(--yt-danger-dark); }
+
+  .btn-ghost {
+    @apply inline-flex items-center gap-2 px-4 py-2 font-medium text-sm rounded-full
+           transition-colors duration-150;
+    color: var(--yt-text-muted);
+  }
+  .btn-ghost:hover { background: var(--yt-surface-alt); color: var(--yt-text); }
+
+  /* ── Form inputs ─────────────────────────────────────────────────────── */
+  .input-field {
+    @apply w-full px-4 py-3 text-sm rounded-lg transition-all duration-150
+           focus:outline-none focus:ring-2;
+    background: var(--yt-bg);
+    border: 1px solid var(--yt-border);
+    color: var(--yt-text);
+    --tw-ring-color: rgba(21, 101, 192, 0.4);
+  }
+  .input-field:focus { border-color: var(--yt-accent); }
+  .input-field::placeholder { color: var(--yt-text-hint); }
+  .input-label {
+    @apply block text-sm font-semibold mb-1.5;
+    color: var(--yt-text);
+  }
+
+  /* ── Tags / badges ───────────────────────────────────────────────────── */
+  .tag-badge {
+    @apply inline-flex items-center px-2.5 py-1 text-xs font-semibold rounded-full;
+    background: var(--yt-surface-alt);
+    color: var(--yt-text-muted);
+    border: 1px solid var(--yt-border);
+  }
+
+  /* ── Page container ──────────────────────────────────────────────────── */
+  .page-container {
+    @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+  }
+
+  /* ── YT subscribe-style CTA button ──────────────────────────────────── */
+  .btn-subscribe {
+    @apply inline-flex items-center gap-2 px-5 py-2.5 font-semibold text-sm rounded-full
+           transition-colors duration-150;
+    background: var(--yt-accent);
+    color: #fff;
+  }
+  .btn-subscribe:hover { background: var(--yt-accent-dark); }
+}
+
+/* ── Auth flow (Login / Register) — YouTube-style card, blue accent ─────────
+   Scoped to .auth-* classes so the rest of the app keeps its red accent.
+   ─────────────────────────────────────────────────────────────────────────── */
+@layer components {
+  .auth-shell {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 48px 16px;
+    background: var(--yt-bg);
+  }
+
+  .auth-container { width: 100%; max-width: 408px; }
+
+  /* Brand mark */
+  .auth-brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+  }
+  .auth-mark {
+    display: inline-flex;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 3px 8px -2px var(--auth-blue-shadow);
+    transition: transform 0.18s ease;
+    flex-shrink: 0;
+  }
+  .auth-brand:hover .auth-mark { transform: scale(1.05) rotate(-2deg); }
+  .auth-wordmark { font-size: 21px; font-weight: 800; color: var(--yt-text); letter-spacing: -0.01em; }
+  .auth-wordmark-light { font-weight: 500; color: var(--yt-text-muted); margin-left: 4px; }
+  .auth-brand-block { text-align: center; margin-bottom: 28px; }
+  .auth-eyebrow { color: var(--yt-text-muted); font-size: 14px; margin-top: 10px; }
+
+  /* Card */
+  .auth-card {
+    background: var(--yt-surface);
+    border: 1px solid var(--yt-border);
+    border-radius: 16px;
+    padding: 36px 32px;
+    box-shadow: 0 2px 8px -2px rgba(0,0,0,0.06), 0 6px 20px -6px rgba(0,0,0,0.08);
+    animation: auth-rise 0.35s ease both;
+  }
+  @keyframes auth-rise {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .auth-title { font-size: 22px; font-weight: 700; color: var(--yt-text); margin-bottom: 6px; }
+  .auth-subtitle { font-size: 14px; color: var(--yt-text-muted); margin-bottom: 28px; line-height: 1.5; }
+
+  /* Alert */
+  .auth-alert {
+    display: flex; gap: 8px; align-items: flex-start;
+    padding: 12px 14px; margin-bottom: 20px;
+    background: #fdecea; border: 1px solid #f6c6c2; color: #b3261e;
+    border-radius: 10px; font-size: 13.5px; line-height: 1.4;
+  }
+  [data-theme="dark"] .auth-alert {
+    background: rgba(244, 67, 54, 0.12); border-color: rgba(244, 67, 54, 0.3); color: #ff8a80;
+  }
+
+  /* Floating-label fields */
+  .auth-field { position: relative; margin-bottom: 22px; }
+  .auth-input {
+    width: 100%;
+    padding: 16px 14px 8px;
+    font-size: 15px;
+    color: var(--yt-text);
+    background: var(--yt-bg);
+    border: 1px solid var(--yt-border);
+    border-radius: 8px;
+    outline: none;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  }
+  .auth-input.has-trailing { padding-right: 44px; }
+  .auth-input::placeholder { color: transparent; }
+  .auth-input:focus {
+    border-color: var(--auth-blue);
+    box-shadow: 0 0 0 3px var(--auth-blue-ring);
+  }
+  .auth-label {
+    position: absolute;
+    left: 14px; top: 16px;
+    font-size: 15px;
+    color: var(--yt-text-hint);
+    background: transparent;
+    padding: 0 4px;
+    pointer-events: none;
+    transition: all 0.15s ease;
+  }
+  .auth-input:focus ~ .auth-label,
+  .auth-input:not(:placeholder-shown) ~ .auth-label {
+    top: -9px;
+    left: 10px;
+    font-size: 11.5px;
+    font-weight: 600;
+    color: var(--auth-blue);
+    background: var(--yt-surface);
+  }
+  .auth-input:disabled { opacity: 0.6; }
+  .auth-trailing-btn {
+    position: absolute;
+    right: 6px; top: 6px;
+    width: 36px; height: 36px;
+    display: flex; align-items: center; justify-content: center;
+    border: none; background: transparent; border-radius: 50%;
+    color: var(--yt-text-muted); cursor: pointer;
+    transition: background 0.15s ease, color 0.15s ease;
+  }
+  .auth-trailing-btn:hover { background: var(--yt-surface-alt); color: var(--yt-text); }
+
+  /* Password strength */
+  .auth-strength-row { display: flex; gap: 4px; margin-top: 10px; }
+  .auth-strength-seg { height: 4px; flex: 1; border-radius: 4px; background: var(--yt-border); transition: background 0.2s ease; }
+  .auth-strength-label { font-size: 12px; color: var(--yt-text-hint); margin-top: 6px; }
+
+  /* Bio counter */
+  .auth-counter { font-size: 12px; color: var(--yt-text-hint); text-align: right; margin-top: -14px; margin-bottom: 18px; }
+
+  /* Forgot password row */
+  .auth-row-between { display: flex; justify-content: flex-end; margin: -8px 0 20px; }
+  .auth-text-link {
+    font-size: 13.5px; font-weight: 600; color: var(--auth-blue);
+    background: none; border: none; padding: 0; cursor: pointer;
+  }
+  .auth-text-link:hover { color: var(--auth-blue-hover); text-decoration: underline; }
+  .auth-notice {
+    font-size: 13px; color: var(--auth-blue-hover);
+    background: var(--auth-blue-soft);
+    border-radius: 8px; padding: 10px 12px;
+    margin: -8px 0 20px; line-height: 1.45;
+  }
+
+  /* Primary button */
+  .auth-btn-primary {
+    width: 100%;
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+    padding: 13px 20px;
+    font-size: 14.5px; font-weight: 700;
+    color: #fff; background: var(--auth-blue);
+    border: none; border-radius: 999px;
+    cursor: pointer;
+    transition: background 0.15s ease, box-shadow 0.15s ease, transform 0.05s ease;
+  }
+  .auth-btn-primary:hover:not(:disabled) {
+    background: var(--auth-blue-hover);
+    box-shadow: 0 6px 16px -4px var(--auth-blue-shadow);
+  }
+  .auth-btn-primary:active:not(:disabled) { transform: scale(0.99); }
+  .auth-btn-primary:disabled { opacity: 0.6; cursor: not-allowed; }
+  .auth-btn-primary:focus-visible { outline: 2px solid var(--auth-blue); outline-offset: 2px; }
+
+  /* Footer below card */
+  .auth-footer { text-align: center; font-size: 14px; color: var(--yt-text-muted); margin-top: 24px; }
+  .auth-footer .auth-link-strong { color: var(--auth-blue); font-weight: 700; text-decoration: none; }
+  .auth-footer .auth-link-strong:hover { text-decoration: underline; }
+
+  @media (max-width: 480px) {
+    .auth-shell { padding: 28px 18px; align-items: flex-start; }
+    .auth-card { padding: 28px 20px; border: none; box-shadow: none; background: transparent; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .auth-card { animation: none; }
+    .auth-brand:hover .auth-mark { transform: none; }
+  }
+  /* ── Soft inset panel (review form, empty states, etc.) ───────────────── */
+  .yt-panel {
+    background: var(--yt-surface-alt);
+    border: 1px solid var(--yt-border);
+    border-radius: 16px;
+  }
+  .yt-icon-danger { color: var(--yt-text-muted); transition: color 0.15s ease; }
+  .yt-icon-danger:hover { color: var(--yt-danger); }
+  .yt-star-filled { color: var(--yt-star); }
+  .yt-star-empty { color: var(--yt-border); }
+
+  /* ── Premium comment cards ─────────────────────────────────────────────── */
+  .yt-comment-card {
+    background: var(--yt-surface);
+    border: 1px solid var(--yt-border);
+    border-radius: 14px;
+    padding: 18px 20px;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  }
+  .yt-comment-card:hover { border-color: rgba(21, 101, 192, 0.35); box-shadow: 0 4px 14px -6px rgba(0,0,0,0.12); }
+  .yt-avatar-ring { box-shadow: 0 0 0 2px var(--yt-surface); }
+}
+
+/* ── Fade page transition ──────────────────────────────────────────────────── */
+.fade-enter-active, .fade-leave-active { transition: opacity 0.15s ease; }
+.fade-enter-from, .fade-leave-to { opacity: 0; }
+
+/* ── Mobile ────────────────────────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .yt-sidebar { transform: translateX(-100%); }
+  .yt-sidebar.mobile-open { transform: translateX(0); width: var(--yt-sidebar-w); }
+  .yt-main { margin-left: 0 !important; }
+  .yt-page-pad { padding: 16px; }
+}
