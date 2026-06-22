@@ -1,10 +1,12 @@
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: "http://localhost:5000/api",
+  // This uses your Render URL on Vercel, and falls back to localhost when running on your computer
+  baseURL: import.meta.env.VITE_API_URL || "http://localhost:5000/api",
   headers: { "Content-Type": "application/json" },
   timeout: 10000,
 });
+
 
 
 // ── Request interceptor: attach JWT from localStorage ─────────────────────────
