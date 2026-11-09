@@ -18,8 +18,25 @@ A high-performance, full-stack recipe directory and community application engine
 
 ## Secured Demo Testing Credentials
 Reviewers can access the live recipe creation and community dashboard tools using the following sandbox profile data:
-* **Admin Login/Email:** `admin@foodblog.dev`
-* **Admin Password:** `Admin@123`
+### Admin Account
+| Field    | Value                  |
+|----------|------------------------|
+| Username | `admin`                |
+| Email    | `admin@foodblog.dev`   |
+| Password | `Admin@123`            |
+| Role     | `admin`                |
+
+> ⚠️ After registering, manually set `role: "admin"` in MongoDB Compass or Atlas:
+> ```
+> db.users.updateOne({ email: "admin@foodblog.dev" }, { $set: { role: "admin" } })
+> ```
+
+### Regular User Accounts
+| Username     | Email                      | Password    |
+|--------------|----------------------------|-------------|
+| `chefmarco`  | `marco@foodblog.dev`       | `Chef@123`  |
+| `bakerlisa`  | `lisa@foodblog.dev`        | `Baker@123` |
+| `foodieken`  | `ken@foodblog.dev`         | `Foodie@123`|
 
 ## Installation & Local Setup
 1. **Clone the repository layout:**
